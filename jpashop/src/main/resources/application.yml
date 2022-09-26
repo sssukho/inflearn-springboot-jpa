@@ -1,9 +1,24 @@
+## config for h2
+#spring:
+#  datasource:
+#    url: jdbc:h2:htcp://localhost/Users/sukholim/dev/h2/data;MVCC=TRUE
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+
+## config for postgresql
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/test_db
+#    username: sssukho
+#    password: tjzhtjzh01
+
 spring:
   datasource:
-    url: jdbc:h2:htcp://localhost/Users/sukholim/dev/h2/data;MVCC=TRUE
+    url: jdbc:h2:http://loclhost/~/dev/h2/data
     username: sa
     password:
-    driver-class-name: org.h2.Driver
+      driver-class-name: org.h2.Driver
 
   jpa:
     database: h2
@@ -17,3 +32,4 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+    org.hibernate.type: trace

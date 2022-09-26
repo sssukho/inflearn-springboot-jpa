@@ -1,19 +1,15 @@
 package jpabook.jpashop.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Slf4j
 @Controller
 public class HelloController {
 
     @GetMapping("hello")
     public String hello(Model model) {
-        log.warn("hello controller called!!!!!!!!!!");
-        model.addAttribute("data", "hello!!!");
+        model.addAttribute("data", "this is parameter!!!");
         return "hello";
     }
 }
-

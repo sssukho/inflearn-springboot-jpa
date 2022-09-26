@@ -1,37 +1,37 @@
 package jpabook.jpashop.repository;
 
-import jpabook.jpashop.model.Member;
-import org.junit.jupiter.api.Test;
+import jpabook.jpashop.domain.Member;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
-@Transactional
-//@Rollback(false) // 트랜잭션 어노테이션 통해서 롤백 처리된 것을 방지한다 (롤백이 되지 않고 DB에 반영이 된다)
-class MemberRepositoryTest {
+
+public class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
 
     @Test
-    public void testMember() throws Exception {
-        // given
+    @Transactional
+//    @Rollback(false)
+    public void testMember() {
         Member member = new Member();
         member.setUsername("memberA");
+        Long savedId = memberRepository.save(member);
 
-        // when
-        Long saveId = memberRepository.save(member);
-        Member findMember = memberRepository.find(saveId);
+        Member findMember = memberRepository.find(savedId);
 
-        // then
-        assertThat(findMember.getId()).isEqualTo(member.getId());
-        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
-        assertThat(findMember).isEqualTo(member);
+        Assertions.assertThat(findMember.getId()).isEqualTo(member.getId());
+        Assertions.assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
+        Assertions.assertThat(findMember).isEqualTo(member); // JPA 엔티티 동일성 보장 (1차 캐시)
     }
-
 }
