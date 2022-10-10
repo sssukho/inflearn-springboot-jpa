@@ -16,11 +16,11 @@ public class Member {
     @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-    private String username;
+    private String name;
 
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "member") // 연관관계의 주인은 Order.member 객체
+    @OneToMany(mappedBy = "member") // 연관관계의 주인은 Order.member 객체 ==> Order 객체에 있는 member 변수
     private List<Order> orders = new ArrayList<>();
 }
