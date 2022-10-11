@@ -50,12 +50,7 @@
 
 > 참고: 회원이 주문을 하기 때문에, 회원이 주문리스트를 가지는 것은 얼핏 보면 잘 설계한 것 같지만, 객체 세상은 실제 세계와는 다르다. 실무에서는 회원이 주문을 참조하지 않고, 주문이 회원을 참조하는 것으로 충분하다. 여기서는 1:N, N:N의 양방향 연관관계를 설명하기 위해서 추가했다.
 
-- ```
-  @Embedded
-  ```
-
-  : 새로운 값 타입을 직접 정의해서 사용할 수 있는데, JPA에서는 이것을 임베디드 타입이라 한다. 이러한 임베디드 타입도 int, String 처럼 값 타입이라는 것이다.
-
+- `@Embedded`: 새로운 값 탕비을 직접 정의해서 사용할 수 있는데, JPA에서는 이것을 임베디드 타입이라 한다. 이러한 임베디드 타입도 int, String 처럼 값 타입이라는 것이다.
   - 사용법
     - `@Embeddable`: 값 타입을 정의하는 곳에 표시
     - `@Embedded` : 값 타입을 사용하는 곳에 표시
@@ -82,7 +77,7 @@
 - 회원과 주문: 일대다, 다대일의 양방향 관계다. 따라서 연관관계의 주인을 정해야 하는데, 외래 키가 있는 주문을 연관관계의 주인으로 정하는 것이 좋다. 그러므로 `Order.member` 를 `ORDERS.MEMBER_ID` 외래 키와 매핑한다
 - 주문상품과 주문: 다대일 양방향 관계다. 외래 키가 주문상품에 있으므로 주문상품이 연관관계의 주인이다. 그러므로 `OrderItem.order` 를 `ORDER_ITEM.ORDER_ID` 외래 키와 매핑한다.
 - 주문상품과 상품: 다대일 단방향 관계다. `OrderItem.item` 을 `ORDER_ITEM.ITEM_ID` 외래 키와 매핑한다.
-- 주문과 배송: 일대일 양방향 관계다. `[Order.delivery](<http://Order.delivery>)` 를 `ORDERS.DELIVERY_ID` 외래 키와 매핑한다.
+- 주문과 배송: 일대일 양방향 관계다. `Order.delivery` 를 `ORDERS.DELIVERY_ID` 외래 키와 매핑한다.
 - 카테고리와 상품: `@ManyToMany` 를 사용해서 매핑한다. (실무에서 @ManyToMany 는 사용하지 말자. 여기서는 다대다 관계를 예제대로 보여주기 위해 추가했을 뿐이다)
 
 > 참고: 외래 키가 있는 곳을 연관관계의 주인으로 정해라. (내가 이해한 바로는 1:N 관계에서 N 쪽이 연관관계의 주인인듯하다) 연관관계의 주인은 단순히 외래 키를 누가 관리하냐의 문제이지 비즈니스상 우위에 있다고 주인으로 정하면 안된다. 예를 들어서 자동차와 바퀴가 있으면, 일대다 관계에서 항상 다쪽에 외래 키가 있으므로 외래 키가 있는 바퀴를 연관관계의 주인으로 정하면 된다. 물론 자동차를 연관관계의 주인으로 정하는 것이 불가능 한 것은 아니지만, 자동차를 연관관계의 주인으로 정하면 자동차가 관리하지 않는 바퀴 테이블의 외래 키 값이 업데이트 되므로 관리와 유지보수가 어렵고, 추가적으로 별도의 업데이트 쿼리가 발생하는 성능 문제도 있다.
@@ -160,7 +155,10 @@ public abstract class Item {
 
     private String name;
     private int price;
-    private int stockQuantity;
+    private int stockQuantity; // 재고 수량
+  
+  	@ManyToMany(mappedBy = "items")
+  	List<Category> categories = new ArrayList<>();
 
 }
 ```
@@ -170,10 +168,6 @@ public abstract class Item {
   - InheritanceType.JOINED: 가장 정교화된 스타일 (각각의 테이블로 변환하는 조인 전략)
   - InheritanceType.TABLE_PER_CLASS: Book, Movie, Album 처럼 3개의 테이블로 나오는 전략
 - `@DiscriminatorValue("A")` : Inheritance 전략이 JOINED 일 때 사용하는 어노테이션으로, 엔티티 저장시 구분 컬럼에 입력할 값을 지정한다. "A" 라 지정한다면 엔티티를 저장할 때 부모 클래스인 Item 의 DTYPE 에 A가 저장된다.
-
-- `JoinColumn(name = "member_id")` : 외래키를 매핑 할 때 사용한다.
-  - name 속성에는 매핑할 외래키 이름을 지정한다.
-  - Order 엔티티의 경우 Delivery 엔티티의 id 값을 매핑한다.
 
 ``` java
 @Entity
@@ -268,12 +262,72 @@ public class Order {
   - Order를 통해 Delivery를 찾는 경우는 많지만, Delivery 를 통해 order를 찾는 일은 흔하지 않다.
   - 따라서 연관관계의 주인은 Order에 있는 delivery에다가 준다.
 
+- `JoinColumn(name = "member_id")` : 외래키를 매핑 할 때 사용한다.
+  - name 속성에는 매핑할 외래키 이름을 지정한다.
+  - Order 엔티티의 경우 Delivery 엔티티의 id 값을 매핑한다.
 
 
 
+``` java
+@Entity
+@Getter
+@Setter
+public class Category {
+  @Id
+  @GeneratedValue
+  @Column(name = "category_id")
+  private Long id;
+  
+  private String name;
+  
+  @ManyToMany // 카테고리도 리스트로 아이템을 가지고, 아이템도 리스트로 카테고리를 가지는 다대다 관계
+  @JoinTable(name = "category_item",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+	)
+  private List<Item> items = new ArrayList<>();
+  
+  @ManyToOne
+  @JoinColumn(name = "parent_id")
+  private Category parent;
+  
+  @OneToMany(mappedBy = "parent")
+  private List<Category> child = new ArrayList<>();
+}
+```
+
+- 실무에서는 다대다 관계를 잘 사용하지 않는다. => Item 쪽에는 아래와 같은 코드를 추가해준다.
+
+  ``` java
+  @ManyToMany(mappedByd = "items")
+  List<Category> categories = new ArrayList<>();
+  ```
+
+- Category 같은 경우에는 계층 구조가 필요하다. 즉, 내 부모가 누군지, 자식은 누군지 등을 알아야 한다. 따라서 `parent`와 `child`와 같이 매핑 관계를 만든다.
+  - 부모는 내 상위로 하나이고, 내 자식은 내 하위로 여러개가 있을 수 있으니까 각각 `@ManyToOne`, `@OneToMany` 등이 될 수 있다.
+
+> 참고: 실무에서는 `@ManyToMany` 를 사용하지 말자.
+> `@ManyToMany` 는 편리한 것 같지만, 중간 테이블(`CATEGORY_ITEM`) 에 컬럼을 추가할 수 없고, 세밀하게 쿼리를 실행하기 어렵기 때문에 실무에서 사용하기에는 한계가 있다. 중간 엔티티(`CategoryItem`) 등을 만들고 `@ManyToOne`, `@OneToMany` 로 매핑해서 사용하자. 정리하면 다대다 매핑을 이대다, 다대일 매핑으로 풀어내서 사용하자.
 
 
 
+``` java
+@Embeddable
+@Getter
+public class Address {
+  private String city;
+  private String street;
+  private String zipcode;
+  
+  protected Address() {}
+  
+  public Address(String city, String street, String zipcode) {
+    this.city = city;
+    this.street = street;
+    this.zipcode = zipcode;
+  }
+}
+```
 
-
-## 엔티티 설계시 주의점
+> 참고: 값 타입은 변경 불가능하게 설계해야 한다.
+> `@Setter` 를 제거하고, 생성자에서 값을 모두 초기화해서 변경 불가능한 클래스를 만들자. JPA 스펙상 엔티티나 임베디드 타입(`@Embeddable`) 은 자바 기본 생성자(default constructor)를 public 또는 protected 로 설정해ㅑㅇ 한다. public 으로 두는 것 보다는 protected 로 설정하는 것이 그나마 더 안전하다. => JPA가 이런 제약을 두는 이유는 JPA 구현 라이브러리가 객체를 생성할 때 리플렉션(Reflection) 같은 기술을 사용할 수 있도록 지원해야 하기 때문이다.

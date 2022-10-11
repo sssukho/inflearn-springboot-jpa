@@ -7,22 +7,23 @@
 #    driver-class-name: org.h2.Driver
 
 ## config for postgresql
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/test_db
-#    username: sssukho
-#    password: tjzhtjzh01
-
 spring:
   datasource:
-    url: jdbc:h2:http://loclhost/~/dev/h2/data
-    username: sa
-    password:
-      driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/test_db
+    username: sssukho
+    password: tjzhtjzh01
+
+#spring:
+#  datasource:
+#    url: jdbc:h2:http://loclhost/~/dev/h2/data
+#    username: sa
+#    password:
+#      driver-class-name: org.h2.Driver
 
   jpa:
-    database: h2
+#    database: h2
     hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL12Dialect
       ddl-auto: create
     properties:
       hibernate:
