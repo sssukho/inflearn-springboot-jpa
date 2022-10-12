@@ -1,5 +1,7 @@
 package jpabook.jpashop.domain;
 
+import static javax.persistence.FetchType.LAZY;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,7 +13,7 @@ import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity 
+@Entity
 @Getter
 @Setter
 public class Delivery {
@@ -20,7 +22,7 @@ public class Delivery {
     @Column(name = "delivery_id")
     private Long id;
 
-    @OneToOne(mappedBy = "delivery")
+    @OneToOne(mappedBy = "delivery", fetch = LAZY)
     private Order order;
 
     @Embedded

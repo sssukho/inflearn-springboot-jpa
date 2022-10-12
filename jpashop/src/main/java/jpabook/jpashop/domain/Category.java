@@ -1,5 +1,7 @@
 package jpabook.jpashop.domain;
 
+import static javax.persistence.FetchType.LAZY;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -33,10 +35,16 @@ public class Category {
     ) // 중간 테이블(CATEGORY_ITEM 테이블)을 매핑해주기 위해 존재해야 함
     private List<Item> items = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
     private List<Category> child = new ArrayList<>();
+
+    //==연관관계 메서드==//
+    public void addChildCategory(Category child) {
+        this.child.add(child);
+        child.setParent(this);
+    }
 }
