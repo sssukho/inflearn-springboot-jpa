@@ -30,7 +30,7 @@ public class Category {
 
     @ManyToMany // 카테고리도 리스트로 아이템을 가지고, 아이템도 리스트로 카테고리를 가지는 다대다 관계
     @JoinTable(name = "category_item",
-            joinColumns = @JoinColumn(name = "cateogry_id"),
+            joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     ) // 중간 테이블(CATEGORY_ITEM 테이블)을 매핑해주기 위해 존재해야 함
     private List<Item> items = new ArrayList<>();
