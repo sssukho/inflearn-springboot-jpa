@@ -1,10 +1,8 @@
-package jpabook.jpashop.web;
+package jpabook.jpashop.controller;
 
 import javax.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
-
-
 
 @Getter
 @Setter
